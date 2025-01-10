@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
+
 import time
 
 import os
@@ -8,10 +9,14 @@ load_dotenv()
 LOGIN = os.getenv("LOGIN")
 PASSWORD = os.getenv("PASSWORD")
 
+
+
 options = webdriver.ChromeOptions()
 options.add_argument('--headless')
 driver = webdriver.Chrome()
 driver.get("https://portal.librus.pl/rodzina")
+
+
 
 acceptButton = driver.find_element(By.XPATH,'''//div[@id="consent-categories-description"]//button[@class="modal-button__primary"]''')
 
@@ -38,5 +43,23 @@ time.sleep(1)
 
 sendLogDataButton = driver.find_element(By.XPATH,"//button[@id='LoginBtn']")
 sendLogDataButton.click()
+
+driver.switch_to.parent_frame()
+
+time.sleep(7)
+
+selectButton = driver.find_element(By.XPATH,'//div[@id="main-menu"]/ul/li[7]/a')
+selectButton.click()
 time.sleep(1)
+plan = driver.find_element(By.XPATH,'//div[@id="main-menu"]/ul/li[7]/ul/li[1]/a')
+plan.click()
+
+
+for window in driver.window_handles:
+    driver.switch_to.window(window)
+# driver switches to windows first window in defaultt one so last one is the opened timetable one    
+with open("lessons.html","w") as file:
+    file.write(driver.page_source)
+    file.close()
 driver.close()
+
