@@ -1,7 +1,12 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 import time
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+LOGIN = os.getenv("LOGIN")
+PASSWORD = os.getenv("PASSWORD")
 
 options = webdriver.ChromeOptions()
 options.add_argument('--headless')
@@ -26,9 +31,9 @@ logButton.click()
 driver.switch_to.frame("caLoginIframe")
 loginInput = driver.find_element(By.XPATH,'//input[@id="Login"]')
 passwordInput = driver.find_element(By.XPATH,'//input[@id="Pass"]')
-loginInput.send_keys("")
+loginInput.send_keys(LOGIN)
 time.sleep(1)
-passwordInput.send_keys("")
+passwordInput.send_keys(PASSWORD)
 time.sleep(1)
 
 sendLogDataButton = driver.find_element(By.XPATH,"//button[@id='LoginBtn']")
