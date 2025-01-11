@@ -26,6 +26,7 @@ with open("lessons.html","r") as file:
 document = BeautifulSoup(documentRAW,"html.parser")
 
 form = document.find(attrs={"name": "formPrzegladajPlan"})
+
 timeTable = form.find(class_="plan-lekcji")
 lessonRows = timeTable.tbody.find_all("tr",class_="line1")
 
@@ -70,10 +71,15 @@ for lessonRow in lessonRows:
     lessons = lessonRow.find_all("td",class_="line1",attrs={"id": "timetableEntryBox"})
     for lesson,day in zip(lessons,dayData):
 
-        lessonDescBox = lesson.find("div",class_="text")
-        lessonInfoBox = lesson.find("div",class_="plan-lekcji-info")
+        for toolTipInfoBox in lesson.select(".tooltip"):
+            toolTipInfoBox.extract()
+
+        lessonDescBox = lesson.find_all("div",class_="text")
+        
+        lessonInfoBox = lesson.find("div",attrs={"class":"plan-lekcji-info"})
         if not lessonDescBox:
             continue
+        lessonDescBox = lessonDescBox[-1]
         
         dayName = next(iter(day))
         if not lessonInfoBox:
