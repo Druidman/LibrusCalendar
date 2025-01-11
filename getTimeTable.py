@@ -23,10 +23,6 @@ class Scraper():
         inputTag = self.driver.find_element(By.XPATH,xpath)
         inputTag.send_keys(data)
         time.sleep(1) 
-    def saveHtmlToFile(self):
-        with open("lessons.html","w") as file:
-            file.write(self.driver.page_source)
-            file.close()
 
     def scrape(self):
         self.driver.get(self.PAGELINK)
@@ -69,9 +65,11 @@ class Scraper():
 
         for window in self.driver.window_handles:
             self.driver.switch_to.window(window)
-        # driver switches to windows first window in defaultt one so last one is the opened timetable one 
-        self.saveHtmlToFile()   
+        # driver switches to windows first window in default one so last one is the opened timetable one  
+        pageHTML = self.driver.page_source
         self.driver.close()
+        return pageHTML
+        
 
 
 

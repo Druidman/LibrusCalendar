@@ -4,10 +4,7 @@ from selenium import webdriver
 
 driver = webdriver.Chrome()
 scraper = Scraper(driver=driver)
-scraper.scrape()
-
-with open("lessons.html","r") as file:
-    documentRAW: str = file.read() 
+documentRAW = scraper.scrape()
 
 parser = Parser(documentRAW=documentRAW)
 parser.parseDocument()
