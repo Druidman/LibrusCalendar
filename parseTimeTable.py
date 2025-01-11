@@ -53,10 +53,6 @@ class Parser():
         
         day[dayName]["start"] = lessonStartTime
 
-    def clearUnwantedTags(self,lesson):
-        for toolTipInfoBox in lesson.select(".tooltip"):
-            toolTipInfoBox.extract()
-        return lesson
     
     def getLessonRows(self):
         form = self.document.find(attrs={"name": "formPrzegladajPlan"})
@@ -66,11 +62,11 @@ class Parser():
     
     def parseLesson(self,lesson,day,lessonStartTime,lessonEndTime):
         lessonDescBox = lesson.find_all("div",class_="text")
-        lessonInfoBox = lesson.find("div",attrs={"class":"plan-lekcji-info"})
+        lessonInfoBox = lesson.find_all("div",attrs={"class":"plan-lekcji-info"})
         if not lessonDescBox:
             return
         
-        lessonDescBox = lessonDescBox[-1]
+        
         dayName = next(iter(day))
 
         if not lessonInfoBox:
@@ -82,6 +78,8 @@ class Parser():
             )
             return
         
+        lessonDescBox = lessonDescBox[-1]
+        lessonInfoBox = lessonInfoBox[-1]
         info = lessonInfoBox.text.strip()
 
         if info == "dzień wolny szkoły": 
@@ -104,7 +102,6 @@ class Parser():
         lessonEndTime = lessonRow.find("td",attrs={"id": "timetableEntryBox"})["data-time_to"]
         lessons = lessonRow.find_all("td",class_="line1",attrs={"id": "timetableEntryBox"})
         for lesson,day in zip(lessons,self.dayData):
-            lesson = self.clearUnwantedTags(lesson)
             self.parseLesson(
                 lesson=lesson,
                 day=day,
