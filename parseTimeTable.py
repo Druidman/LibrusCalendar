@@ -37,6 +37,10 @@ class Parser():
                 }
             }
         ]
+    def saveToFile(self):
+        saveReady = json.dumps(self.dayData,indent=2)
+        with open("lessonData.json","w") as file:
+            file.write(saveReady)
     
     def formatDocument(self,documentRAW):
         scriptTags = re.findall(r"(<script.*?>.*?</script>)", documentRAW, re.DOTALL)
@@ -53,7 +57,6 @@ class Parser():
         
         day[dayName]["start"] = lessonStartTime
 
-    
     def getLessonRows(self):
         form = self.document.find(attrs={"name": "formPrzegladajPlan"})
         timeTable = form.find(class_="plan-lekcji")
@@ -113,7 +116,8 @@ class Parser():
         lessonRows = self.getLessonRows()
         for lessonRow in lessonRows:
             self.parseLessonRow(lessonRow)
-        print(self.dayData)
+        self.saveToFile()
+        return self.dayData
             
             
 

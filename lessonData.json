@@ -1,0 +1,32 @@
+[
+    {
+        "poniedzia\u0142ek": {
+            "start": null,
+            "end": null
+        }
+    },
+    {
+        "wtorek": {
+            "start": "08:10",
+            "end": "15:25"
+        }
+    },
+    {
+        "\u015broda": {
+            "start": "08:10",
+            "end": "13:40"
+        }
+    },
+    {
+        "czwartek": {
+            "start": "10:00",
+            "end": "15:25"
+        }
+    },
+    {
+        "pi\u0105tek": {
+            "start": "08:10",
+            "end": "14:35"
+        }
+    }
+]

@@ -7,4 +7,5 @@ scraper = Scraper(driver=driver)
 documentRAW = scraper.scrape()
 
 parser = Parser(documentRAW=documentRAW)
-parser.parseDocument()
+lessonData = parser.parseDocument()
+print(lessonData)
