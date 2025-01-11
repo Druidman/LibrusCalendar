@@ -8,30 +8,35 @@ class Parser():
         self.dayData = [
             {
                 "poniedziałek": {
+                    "date": None,
                     "start": None,
                     "end": None
                 }
             },
             {
                 "wtorek": {
+                    "date": None,
                     "start": None,
                     "end": None
                 }
             },
             {
                 "środa": {
+                    "date": None,
                     "start": None,
                     "end": None
                 }
             },
             {
                 "czwartek": {
+                    "date": None,
                     "start": None,
                     "end": None
                 }
             },
             {
                 "piątek": {
+                    "date": None,
                     "start": None,
                     "end": None
                 }
@@ -50,6 +55,7 @@ class Parser():
         return BeautifulSoup(documentRAW,"html.parser")
 
     def assingStartEndTime(self,day,dayName,lessonStartTime,lessonEndTime):
+       
         day[dayName]["end"] = lessonEndTime
 
         if day[dayName]["start"]:
@@ -64,20 +70,20 @@ class Parser():
         return lessonRows
     
     def parseLesson(self,lesson,day,lessonStartTime,lessonEndTime):
+        dayName = next(iter(day))
+        if not day[dayName]["date"]:
+            day[dayName]["date"] = lesson["data-date"]
         lessonDescBox = lesson.find_all("div",class_="text")
         lessonInfoBox = lesson.find_all("div",attrs={"class":"plan-lekcji-info"})
         if not lessonDescBox:
             return
-        
-        
-        dayName = next(iter(day))
-
         if not lessonInfoBox:
             self.assingStartEndTime(
                 day=day,
                 dayName=dayName,
                 lessonStartTime=lessonStartTime,
-                lessonEndTime=lessonEndTime
+                lessonEndTime=lessonEndTime,
+            
             )
             return
         
@@ -111,6 +117,8 @@ class Parser():
                 lessonStartTime=lessonStartTime,
                 lessonEndTime=lessonEndTime
             )
+            
+            
                   
     def parseDocument(self):
         lessonRows = self.getLessonRows()
