@@ -10,6 +10,23 @@ from googleapiclient.errors import HttpError
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
+def getEvents(service,calendarId,personName):
+    allEvents = service.events().list(
+        calendarId=calendarId
+    ).execute().get("items")
+    eventIds = []
+    for event in allEvents:
+        description = event.get("description",None)
+  
+        if not description:
+            continue
+        if description.lower() == f"botentry{personName.lower()}":
+            eventIds.append(event["id"])
+    return eventIds
+
+
+  
+
 def nextYearDate():
   fastForwardYear = datetime.datetime(
     datetime.datetime.now().year + 1,
@@ -49,12 +66,15 @@ def googleOAuth():
       token.write(creds.to_json())
   return creds
 
-def loadLessonData():
-  with open("lessonData.json","r") as file:
+def loadLessonData(personName):
+  with open(f"{personName}lessonData.json","r") as file:
     data = json.load(file)
   return data
 
-def updateEvents(service,data,calendarId):
+def updateEvents(service,data,personName,calendarId):
+  eventIds = getEvents(service,calendarId=calendarId,personName=personName)
+
+  print(eventIds)
   for day in data:
     dayName = next(iter(day))
     date = day[dayName]["date"]
@@ -67,10 +87,11 @@ def updateEvents(service,data,calendarId):
     endDateTime = f"{date}T{endTime}:00.0Z"
     
     fastForwardYear = nextYearDate()
+    
     event = service.events().insert(
       calendarId=calendarId,
       body={
-        "summary": "Mateus w szkole",
+        "summary": f"{personName} w szkole",
         "start": {
           "dateTime": startDateTime,
           "timeZone": "Europe/Warsaw"
@@ -81,7 +102,8 @@ def updateEvents(service,data,calendarId):
         },
         'recurrence': [
           f'RRULE:FREQ=WEEKLY;UNTIL={fastForwardYear}'
-        ]
+        ],
+        "description": f"BotEntry{personName}"
       }
       
     ).execute()
@@ -96,12 +118,15 @@ def main():
     )
     if not calendarId:
       return
+    personName = "Mateusz"
+    data = loadLessonData(personName=personName)
     
-    data = loadLessonData()
     updateEvents(
       service=service,
       data=data,
-      calendarId=calendarId
+      calendarId=calendarId,
+      personName=personName
+  
     )
   except HttpError as error:
     print(f"An error occurred: {error}")
