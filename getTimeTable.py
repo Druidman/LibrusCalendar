@@ -1,15 +1,18 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 import time
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import os
-from dotenv import load_dotenv
-load_dotenv()
 
 
 class Scraper():
-    def __init__(self,driver):
-        self.LOGIN: str = os.getenv("LOGIN")
-        self.PASSWORD: str = os.getenv("PASSWORD")
+    def __init__(self,driver,login,password,weeksToScrape):
+        
+        self.LOGIN: str = login
+        self.PASSWORD: str = password
+        self.WEEKS_TO_SCRAPE: str = weeksToScrape
         self.driver: webdriver.Chrome = driver
 
         self.PAGELINK = "https://portal.librus.pl/rodzina"
@@ -18,13 +21,14 @@ class Scraper():
         button = self.driver.find_element(By.XPATH,xpath)
         button.click()
         time.sleep(1)
+        
 
     def fillInputTag(self,data,xpath):
         inputTag = self.driver.find_element(By.XPATH,xpath)
         inputTag.send_keys(data)
         time.sleep(1) 
 
-    def scrape(self):
+    def scrape(self) -> list:
         self.driver.get(self.PAGELINK)
         
         acceptButton = '//div[@id="consent-categories-description"]//button[@class="modal-button__primary"]'
@@ -66,9 +70,14 @@ class Scraper():
         for window in self.driver.window_handles:
             self.driver.switch_to.window(window)
         # driver switches to windows first window in default one so last one is the opened timetable one  
-        pageHTML = self.driver.page_source
+        pageHTMLs = []
+        for i in range(0,self.WEEKS_TO_SCRAPE):
+            
+            pageHTMLs.append(self.driver.page_source)
+            self.clickButton("/html/body/div[1]/div/div/div/form/table[1]/tbody/tr[1]/th/a[2]")
+            time.sleep(7)
         self.driver.close()
-        return pageHTML
+        return pageHTMLs
         
 
 

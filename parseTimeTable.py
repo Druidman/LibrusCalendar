@@ -3,8 +3,9 @@ from bs4 import BeautifulSoup
 import re
     
 class Parser():
-    def __init__(self,documentRAW):
+    def __init__(self,documentRAW, personName):
         self.document = self.formatDocument(documentRAW)
+        self.personName = personName
         self.dayData = [
             {
                 "poniedziałek": {
@@ -44,8 +45,9 @@ class Parser():
         ]
     def saveToFile(self):
         saveReady = json.dumps(self.dayData,indent=2)
-        with open("lessonData.json","w") as file:
+        with open(f"{self.personName}LessonData.json","w") as file:
             file.write(saveReady)
+            file.close()
     
     def formatDocument(self,documentRAW):
         scriptTags = re.findall(r"(<script.*?>.*?</script>)", documentRAW, re.DOTALL)
