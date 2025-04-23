@@ -16,17 +16,37 @@ class Scraper():
         self.driver: webdriver.Chrome = driver
 
         self.PAGELINK = "https://portal.librus.pl/rodzina"
+        self.wait = WebDriverWait(driver=driver,timeout=10)
 
     def clickButton(self,xpath: str):
-        button = self.driver.find_element(By.XPATH,xpath)
-        button.click()
-        time.sleep(1)
+        try:
+            button = self.wait.until(EC.element_to_be_clickable((By.XPATH,xpath)))
+    
+            button.click()
+            time.sleep(1)
+        
+        except Exception as e:
+            print(f"EXCEPTION OCCURED IN [CLICKING] ELEMENT: {xpath}")
+            if input("print exception?"):
+                print(e)
+            os.exit()
+            return 
+        
         
 
     def fillInputTag(self,data,xpath):
-        inputTag = self.driver.find_element(By.XPATH,xpath)
-        inputTag.send_keys(data)
-        time.sleep(1) 
+        try:
+            
+            inputTag = self.wait.until(EC.element_to_be_clickable((By.XPATH,xpath)))
+            inputTag.send_keys(data)
+        
+        except Exception as e:
+            print(f"EXCEPTION OCCURED IN [filling]  ELEMENT: {xpath}")
+            if input("print exception?"):
+                print(e)
+            os.exit()
+            return 
+        
 
     def scrape(self) -> list:
         self.driver.get(self.PAGELINK)
@@ -34,10 +54,10 @@ class Scraper():
         acceptButton = '//div[@id="consent-categories-description"]//button[@class="modal-button__primary"]'
         self.clickButton(acceptButton)
 
-        dropDown = '//*[@id="dropdownTopRightMenuButton"]'
-        self.clickButton(dropDown)
+        loginDropDown = '/html/body/nav/div/div[1]/div/div[2]/a[3]'
+        self.clickButton(loginDropDown)
 
-        loginPageButton = '//*[@id="dropdownSynergiaMenu"]/a[2]'
+        loginPageButton = '/html/body/nav/div/div[1]/div/div[2]/div/a[2]'
         self.clickButton(loginPageButton)
 
 

@@ -74,12 +74,13 @@ class Calendar():
       startTime = day[dayName]["start"]
       endTime = day[dayName]["end"]
 
+
       startDateTime = f"{date}T{startTime}:00"
       endDateTime = f"{date}T{endTime}:00"
 
 
 
-      body= {
+      inSchoolBody = {
           "summary": f"{self.personName} w szkole",
           "start": {
             "dateTime": startDateTime,
@@ -89,31 +90,51 @@ class Calendar():
             "dateTime": endDateTime,
             "timeZone": "Europe/Warsaw"
           },
+          "colorId": "4",
           "description": f"BotEntry{self.personName}"
         }
+      
+      notInSchoolBody = {
+        "summary": f"{self.personName} w Domu",
+        "start": {
+          "dateTime": f"{date}T00:00:01",
+          "timeZone": "Europe/Warsaw"
+        },
+        "end": {
+          "dateTime": f"{date}T23:59:59",
+          "timeZone": "Europe/Warsaw"
+        },
+        "colorId": "10",
+        "description": f"BotEntry{self.personName}"
+      }
+
       
       events = self.getEvents(date=date)
 
       if events:
         if not startTime or not endTime:
+          eventId = events[0]["id"]
           res = self.service.events().delete(
             calendarId = self.calendarId,
-            eventId = events[0]["id"]
+            eventId = eventId
           ).execute()
-          print(f'delete event {res["summary"]} {res["start"]["dateTime"]}')
+
+          print(f'delete event {eventId}')
+
+          self.insertEvent(body=notInSchoolBody)
         else:
           res = self.service.events().update(
             calendarId = self.calendarId,
             eventId = events[0]["id"],
-            body = body
+            body = inSchoolBody
           ).execute()
           print(f'update event {res["summary"]} {res["start"]["dateTime"]}')
       else:
-        res = self.service.events().insert(
-          calendarId = self.calendarId,
-          body = body
-        ).execute()
-        print(f'insert event {res["summary"]} {res["start"]["dateTime"]}')
+        if not startTime or not endTime:
+          self.insertEvent(body=notInSchoolBody)
+        else:
+          self.insertEvent(body=inSchoolBody)
+          
       
   def loadLessonData(self) -> dict:
     with open(f"{self.personName}LessonData.json", "r") as file:
@@ -125,6 +146,7 @@ class Calendar():
     return build("calendar", "v3", credentials=creds)
 
   def insertToCalendar(self,lessonData):
+
     try:
   
       if lessonData:
@@ -135,3 +157,15 @@ class Calendar():
       self.upsertEvents(data=data)
     except HttpError as error:
       print(f"An error occurred: {error}")
+
+  def insertEvent(self,body: str) -> bool:
+    res = self.service.events().insert(
+      calendarId = self.calendarId,
+      body = body
+    ).execute()
+    if not res:
+      print(f"ERROR inserting event")
+      return False
+    
+    print(f'SUCCES insert event {res["summary"]} {res["start"]["dateTime"]}')
+    return True
