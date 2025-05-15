@@ -90,7 +90,7 @@ class Calendar():
             "dateTime": endDateTime,
             "timeZone": "Europe/Warsaw"
           },
-          "colorId": "4",
+          "colorId": "5",
           "description": f"BotEntry{self.personName}"
         }
       
@@ -120,8 +120,6 @@ class Calendar():
           ).execute()
 
           print(f'delete event {eventId}')
-
-          self.insertEvent(body=notInSchoolBody)
         else:
           res = self.service.events().update(
             calendarId = self.calendarId,
@@ -130,10 +128,9 @@ class Calendar():
           ).execute()
           print(f'update event {res["summary"]} {res["start"]["dateTime"]}')
       else:
-        if not startTime or not endTime:
-          self.insertEvent(body=notInSchoolBody)
-        else:
+        if startTime and endTime:
           self.insertEvent(body=inSchoolBody)
+       
           
       
   def loadLessonData(self) -> dict:
