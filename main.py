@@ -8,11 +8,12 @@ from selenium.webdriver.chrome.options import Options
 
 import os, json
 
+
 def setupAppData():
     data = None
-    scraperDataFilePath = os.path.join(os.getcwd(),"scraperWorkingData.json")
+    scraperDataFilePath = os.path.join(os.getcwd(), "scraperWorkingData.json")
     if os.path.exists(scraperDataFilePath):
-        data = json.load(open(scraperDataFilePath,"r"))
+        data = json.load(open(scraperDataFilePath, "r"))
 
     if not data:
         personName = str(input("Name: "))
@@ -27,15 +28,15 @@ def setupAppData():
             "calendarId": calendarId,
             "weeksToScrape": weeksToScrape,
             "librusLogin": librus_login,
-            "librusPassword": librus_password
+            "librusPassword": librus_password,
         }
-        with open(scraperDataFilePath,"w") as file:
-            dataToSave = json.dumps(data,indent=2)
+        with open(scraperDataFilePath, "w") as file:
+            dataToSave = json.dumps(data, indent=2)
             file.write(dataToSave)
             file.close()
 
-    
     return data
+
 
 calendar = Calendar()
 
@@ -45,8 +46,10 @@ calendar.calendarId = appData["calendarId"]
 chrome_options = Options()
 chrome_options.add_argument("--window-size=1920,1080")
 chrome_options.add_argument("--mute-audio")
-chrome_options.add_argument("--headless=new")
-chrome_options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+# chrome_options.add_argument("--headless=new")
+chrome_options.add_argument(
+    "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+)
 
 
 driver = webdriver.Chrome(options=chrome_options)
@@ -54,12 +57,11 @@ scraper = Scraper(
     driver=driver,
     login=appData["librusLogin"],
     password=appData["librusPassword"],
-    weeksToScrape=appData["weeksToScrape"]
+    weeksToScrape=appData["weeksToScrape"],
 )
 
 documentsRAW = scraper.scrape()
 for documentRAW in documentsRAW:
-    parser = Parser(documentRAW=documentRAW,personName=appData["personName"])
+    parser = Parser(documentRAW=documentRAW, personName=appData["personName"])
     lessonData = parser.parseDocument()
     calendar.insertToCalendar(lessonData=lessonData)
-        
